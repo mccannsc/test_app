@@ -16,7 +16,7 @@ class User < ActiveRecord::Base
   attr_accessible :email, :name, :password, :password_confirmation              # The attr_accessible section tells Rails which attributes of the model are accessible
   has_secure_password
   
-  before_save { |user| user.email = email.downcase }
+  before_save { self.email.downcase! }
   
   validates :name, presence: true, length: { maximum: 50 }
   VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i          # This ensures that only email addresses that match the pattern will be considered
