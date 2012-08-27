@@ -9,4 +9,9 @@ FactoryGirl.define do
       admin true
     end
   end
+  
+  factory :micropost do       # This is a factory for microposts. 
+    content "Lorem ipsum"
+    user                        # This tells Factor Girl about the microposts associated user. 
+  end
 end

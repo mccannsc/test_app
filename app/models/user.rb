@@ -14,7 +14,9 @@
 
 class User < ActiveRecord::Base
   attr_accessible :email, :name, :password, :password_confirmation              # The attr_accessible section tells Rails which attributes of the model are accessible
+  attr_protected :admin
   has_secure_password
+  has_many :microposts, dependent: :destroy
   
   before_save { |user| user.email = email.downcase }
   
@@ -25,6 +27,12 @@ class User < ActiveRecord::Base
   validates :email, presence: true, format: { with: VALID_EMAIL_REGEX }, uniqueness: { case_sensitive: false }
   validates :password, presence: true, length: { minimum: 6 } 
   validates :password_confirmation, presence: true
+  
+  def feed
+    #This is preliminary. 
+    Micropost.where("user_id = ?", id)          #Including the ? ensures that id is propoerly escaped before including the SQL - this is for security. 
+  end
+  
 
 private
 

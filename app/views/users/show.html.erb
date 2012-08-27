@@ -8,4 +8,13 @@
       </h1>
     </section>
   </aside>
+  <div class = "span8">                                     <!-- This adds microposts to the user show page. -->
+      <% if @user.microposts.any? %>                        <!-- by running the .any? test it wont show an empty list -->
+      <h3>Microposts (<%= @user.microposts.count %>) </h3>
+      <ol class="microposts">
+          <%= render @microposts %>                         <!-- This uses a micropost partial. -->
+          </ol>
+          <%= will_paginate @microposts %>
+      <% end %>
+  </div>
 </div>

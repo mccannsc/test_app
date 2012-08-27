@@ -35,10 +35,19 @@ describe "User pages" do
   
   describe "Profile page" do
     let(:user) { FactoryGirl.create(:user) }      #This assigns a User factory to the var :user
+    let!(:m1) { FactoryGirl.create(:micropost, user: user, content: "Foo") }
+    let!(:m2) {FactoryGirl.create(:micropost, user: user, content: "Bar") }
+    
     before { visit user_path(user) }
     
     it { should have_selector('h1', text: user.name) }
     it { should have_selector('title', text: user.name) }
+    
+    describe "Microposts" do
+      it { should have_content(m1.content) }
+      it { should have_content(m2.content) }
+      it { should have_content(user.microposts.count) }
+    end
   end
   
   describe "signup page" do
@@ -46,6 +55,15 @@ describe "User pages" do
     
     it { should have_selector('h1', text: 'Sign Up') }
     it { should have_selector('title', text: full_title('Sign up')) }
+    
+    describe "already logged in so it doesnt do anything" do
+      let(:user) { FactoryGirl.create(:user) }
+      before { sign_in user }
+      before { visit signup_path }
+
+    #it { should have_selector('h1', text: 'Test App') }
+
+    end
   end
   
   describe "signup" do
@@ -67,16 +85,17 @@ describe "User pages" do
     end
     
     describe "with valid information" do
-      before do
+     before do
         fill_in "Name",         with: "Example User"
         fill_in "Email",        with: "user@example.com"
         fill_in "Password",     with: "foobar"
-        fill_in "Confirmation", with: "foobar"
+        fill_in "Confirm Password", with: "foobar"
       end
-      
+  
       it "should create a user" do
         expect { click_button submit }.to change(User, :count).by(1)
       end
+      
       
       describe "after saving the user" do
         before { click_button submit }
@@ -86,7 +105,7 @@ describe "User pages" do
         it { should have_selector('div.alert.alert-success', text: 'Welcome') }
         it { should have_link('Sign out') }
       end
-    end
+    end   
   end
   
   describe "edit" do
@@ -99,7 +118,8 @@ describe "User pages" do
     describe "page" do
       it { should have_selector('h1',     text: "Update your profile") }
       it { should have_selector('title',  text: "Edit user") }
-      it { should have_link('change',     href:  'http://gravatar.com/emails') }
+      it { should have_link('change',     href:  'http://gravatar.com/emails',  target: "_blank") }
+      
     end
     
     describe "with invalid information" do
@@ -112,6 +132,7 @@ describe "User pages" do
       let(:new_name)    { "New Name" }
       let(:new_email)   { "new@example.com" }
       before do
+        
         fill_in "Name",               with: new_name
         fill_in "Email",              with: new_email
         fill_in "Password",            with: user.password

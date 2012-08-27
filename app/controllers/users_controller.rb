@@ -2,13 +2,15 @@ class UsersController < ApplicationController
   before_filter :signed_in_user, only: [:index, :edit, :update, :destroy]         # before_filter applies to every action so we need to specify we only want edit and update. 
   before_filter :correct_user, only: [:edit, :update]
   before_filter :admin_user, only: :destroy
+  before_filter :logged_in_user, only: [:new, :create]    # This is part of my answer to 9.6
   
   def show
     @user = User.find(params[:id])
+    @microposts = @user.microposts.paginate(page: params[:page])
   end
   
   def new
-    @user = User.new
+    @user = User.new  
   end
   
   def create
@@ -46,14 +48,7 @@ class UsersController < ApplicationController
   end
   
       private
-      
-          def signed_in_user
-            unless signed_in?
-              store_location
-              redirect_to signin_url, notice: "Please sign in." 
-            end
-          end
-          
+       
           def correct_user
             @user = User.find(params[:id])
             redirect_to(root_path) unless current_user?(@user)      # The current_user? boolean method is defined in sessions_helper.rb
@@ -61,6 +56,12 @@ class UsersController < ApplicationController
           
           def admin_user
             redirect_to(root_path) unless current_user.admin?
+          end
+          
+          def logged_in_user                                        # This is part of my answer to 9.6
+            if signed_in?
+              redirect_to root_path, notice: "You are already logged in."
+            end
           end
   
 end
